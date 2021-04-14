@@ -1,17 +1,12 @@
 """
 Generates a nice looking thermocycler program schematic for input into a lab notebook or presentation
-Requires python 3ish, PILLOW, NUMPY
-Example input at bottom of file. You will probably have to alter the image saving feature to fit your filesystem.
-
+Requires python 3ish, PILLOW
 @author: croots
-@version: 0.1
+@version: 0.2
 """
 
 import PIL
 from PIL import ImageDraw
-from IPython.display import Image, display
-import numpy as np
-import hashlib
 
 def pcr_image(program):
     # Decode String
@@ -22,7 +17,7 @@ def pcr_image(program):
     current_subprogram = 1
     subprograms = 1
     for step in program:
-        if "" is step:
+        if "" == step:
             continue
         elif "/" in step:
             if "cycles" not in encoded_program[f"{current_subprogram}"].keys():
@@ -44,7 +39,7 @@ def pcr_image(program):
                     continue
                 except:
                     pass
-            elif "]" is step:
+            elif "]" == step:
                 continue
         raise ValueError(f"Unrecognized Step {step}.")
     # Clean up if the last subprogram has no steps
@@ -87,19 +82,17 @@ def pcr_image(program):
         for step in encoded_program[f"{sub_program}"]["steps"]:
             current_position[0] += 50
             pcr_diagram.text((current_position[0]+5,current_position[1]+25+25*ordered_temperatures.index(step[0])),
-                         f"{step[0]}",
-                         fill=text_color)
+                             f"{step[0]}",
+                             fill=text_color)
             line_ends.append([current_position[0]-8,current_position[1]+38+25*ordered_temperatures.index(step[0])])
             line_ends.append([current_position[0]+30,current_position[1]+38+25*ordered_temperatures.index(step[0])])
             pcr_diagram.text((current_position[0],current_position[1]+42+25*ordered_temperatures.index(step[0])),
-                         f"{step[1]}",
-                         fill=text_color)
+                             f"{step[1]}",
+                             fill=text_color)
         current_position[0] += 50
     for i, line_end in enumerate(line_ends[1:]):
         pcr_diagram.line((line_ends[i][0], line_ends[i][1]) + (line_end[0], line_end[1]), fill=line_color)
-    program_hash = hashlib.md5(program_string.encode("UTF-8")) 
-    img.save(f"pcr_images/{program_hash.hexdigest()}.png")
-    display(Image(filename=f"pcr_images/{program_hash.hexdigest()}.png"))
-    print(f"Image saved as pcr_images/{program_hash.hexdigest()}.png")
+    img.show()
 
-pcr_image("98/2:00 35[ 98/0:10 66/0:30 72/1:15 ] 72/10:00 4/0:00")
+if __name__ == '__main__':
+    pcr_image("98/2:00 35[ 98/0:10 66/0:30 72/1:15 ] 72/10:00 4/0:00")
