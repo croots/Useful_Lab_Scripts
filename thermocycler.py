@@ -2,11 +2,11 @@
 Generates a nice looking thermocycler program schematic for input into a lab notebook or presentation
 Requires python 3ish, PILLOW
 @author: croots
-@version: 0.2
+@version: 0.3
 """
 
 import PIL
-from PIL import ImageDraw
+from PIL import ImageDraw, ImageFont
 
 def pcr_image(program):
     # Decode String
@@ -64,35 +64,38 @@ def pcr_image(program):
         ordered_temperatures = unique_temperatures
     ordered_temperatures=tuple(ordered_temperatures)
     # Draw Image
-    imgwidth = 700
-    imgheight = 70+25*ordered_temperatures.index(step[0])
+    imgwidth = 7000
+    imgheight = 700+100*ordered_temperatures.index(step[0])
     img = PIL.Image.new('RGB', (imgwidth, imgheight), color = 'white')
     pcr_diagram = PIL.ImageDraw.Draw(img)
     current_position = [0,5]
     line_ends = []
     text_color = (50,50,50)
     line_color = (150,150,150)
+    font = ImageFont.truetype("arial.ttf", 60)
     for i, sub_program in enumerate(encoded_program):
         if i != 0:
-            pcr_diagram.line((current_position[0]-5, 0) + (current_position[0]-5, imgheight), fill=line_color)
+            pcr_diagram.line((current_position[0]-5, 0) + (current_position[0]-5, imgheight), fill=line_color, width=5)
         pcr_diagram.text((current_position[0],0),
                          f"{encoded_program[f'{sub_program}']['cycles']}x",
-                         fill=text_color)
-        current_position[0] -= 30
+                         fill=text_color, font=font)
+        current_position[0] -= 300
         for step in encoded_program[f"{sub_program}"]["steps"]:
-            current_position[0] += 50
-            pcr_diagram.text((current_position[0]+5,current_position[1]+25+25*ordered_temperatures.index(step[0])),
+            current_position[0] += 500
+            pcr_diagram.text((current_position[0]+5,current_position[1]+250+100*ordered_temperatures.index(step[0])),
                              f"{step[0]}",
-                             fill=text_color)
-            line_ends.append([current_position[0]-8,current_position[1]+38+25*ordered_temperatures.index(step[0])])
-            line_ends.append([current_position[0]+30,current_position[1]+38+25*ordered_temperatures.index(step[0])])
-            pcr_diagram.text((current_position[0],current_position[1]+42+25*ordered_temperatures.index(step[0])),
+                             fill=text_color, font=font)
+            line_ends.append([current_position[0]-80,current_position[1]+380+100*ordered_temperatures.index(step[0])])
+            line_ends.append([current_position[0]+300,current_position[1]+380+100*ordered_temperatures.index(step[0])])
+            pcr_diagram.text((current_position[0],current_position[1]+420+100*ordered_temperatures.index(step[0])),
                              f"{step[1]}",
-                             fill=text_color)
-        current_position[0] += 50
+                             fill=text_color, font=font)
+        current_position[0] += 500
     for i, line_end in enumerate(line_ends[1:]):
-        pcr_diagram.line((line_ends[i][0], line_ends[i][1]) + (line_end[0], line_end[1]), fill=line_color)
+        pcr_diagram.line((line_ends[i][0], line_ends[i][1]) + (line_end[0], line_end[1]), fill=line_color, width=5)
     img.show()
+    img.save("img.png")
 
 if __name__ == '__main__':
-    pcr_image("98/2:00 35[ 98/0:10 66/0:30 72/1:15 ] 72/10:00 4/0:00")
+    #pcr_image("98/0:30 32[ 98/0:20 55/0:20 72/0:40 ] 72/2 4/0:00")
+    pcr_image("25[ 42/1:30 16/3:00 ] 50/5:00 80/10:00 4/0:00")
