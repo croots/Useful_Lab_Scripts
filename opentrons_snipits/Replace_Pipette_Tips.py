@@ -1,10 +1,10 @@
 """
 By default, the Opentrons API raises an error if you try to retreve a tip that is not in the tiprack. 
-This script replaces the tiprack with a new tiprack that has the same tips as the original tiprack.
+This script allows you to overwrite that behavior ex. prompt you to replace the tip box.
 
 This does this by hijacking the properties of the pipette instrumentcontext and applying them to a new
 class that has the overwritten behavior for when the pipette runs out of tips. The below code is an example
-of an implementation of this: instructing the robot to throw out 150 pipette tips from a rack in slot 1.
+of an implementation of this: instructing the robot to throw out 100 pipette tips from a rack in slot 1.
 
 To deploy it yourself, you may need to make ajustments to the pipette class for your particular use case and
 obviously you will need to tell the robot what is on the deck/integrate the rest of your protocol.
